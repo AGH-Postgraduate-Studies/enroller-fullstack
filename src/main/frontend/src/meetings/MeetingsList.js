@@ -4,8 +4,8 @@ export default function MeetingsList({
   meetings,
   username,
   onDelete,
-  onSignOut,
-  onSignIn,
+  onSignIntoMeeting,
+  onRemoveFromMeeting,
 }) {
   return (
     <table>
@@ -26,7 +26,7 @@ export default function MeetingsList({
               {meeting.participants.length > 0 ? (
                 <ul>
                   {meeting.participants.map((p) => (
-                    <li key={p}>{p}</li>
+                    <li key={p.login}>{p.login}</li>
                   ))}
                 </ul>
               ) : (
@@ -38,8 +38,8 @@ export default function MeetingsList({
                 meeting={meeting}
                 username={username}
                 onDelete={() => onDelete(meeting)}
-                onSignIn={() => onSignIn(meeting)}
-                onSignOut={() => onSignOut(meeting)}
+                onSignIntoMeeting={() => onSignIntoMeeting(meeting)}
+                onRemoveFromMeeting={() => onRemoveFromMeeting(meeting)}
               />
             </td>
           </tr>

@@ -7,13 +7,29 @@ import UserPanel from "./UserPanel";
 function App() {
   const [loggedIn, setLoggedIn] = useState("");
 
-  function login(email) {
-    if (email) {
+  async function signIn(email, password) {
+    const response = await fetch("/api/tokens", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login: email, password: password }),
+    });
+    if (response.ok) {
       setLoggedIn(email);
     }
   }
 
-  function logout() {
+  async function signUp(email, password) {
+    const response = await fetch("/api/participants", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login: email, password: password }),
+    });
+    if (response.ok) {
+      setLoggedIn(email);
+    }
+  }
+
+  function signOut() {
     setLoggedIn("");
   }
 
@@ -21,9 +37,13 @@ function App() {
     <div>
       <h1>System do zapisów na zajęcia</h1>
       {loggedIn ? (
-        <UserPanel username={loggedIn} onLogout={logout} />
+        <UserPanel username={loggedIn} onLogout={signOut} />
       ) : (
-        <LoginForm onLogin={login} />
+        <LoginForm
+          onSignIn={signIn}
+          onSignUp={signUp}
+          setLoggedIn={setLoggedIn}
+        />
       )}
     </div>
   );

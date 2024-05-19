@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
 
@@ -6,36 +6,66 @@ export default function MeetingsPage({ username }) {
   const [meetings, setMeetings] = useState([]);
   const [addingNewMeeting, setAddingNewMeeting] = useState(false);
 
-  function handleNewMeeting(meeting) {
-    const nextMeetings = [...meetings, meeting];
-    setMeetings(nextMeetings);
-    setAddingNewMeeting(false);
-  }
+  const fetchMeetings = async () => {
+    const response = await fetch("/api/meetings");
+    if (response.ok) {
+      const meetings = await response.json();
+      setMeetings(meetings);
+    }
+  };
 
-  function handleDeleteMeeting(meeting) {
-    const nextMeetings = meetings.filter((m) => m !== meeting);
-    setMeetings(nextMeetings);
-  }
-
-  function handleSignIn(meeting) {
-    const nextMeetings = meetings.map((m) => {
-      if (m === meeting) {
-        m.participants = [...m.participants, username];
-      }
-      return m;
+  async function handleNewMeeting(meeting) {
+    const response = await fetch("/api/meetings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(meeting),
     });
-    setMeetings(nextMeetings);
+    if (response.ok) {
+      const nextMeetings = [...meetings, meeting];
+      setMeetings(nextMeetings);
+      setAddingNewMeeting(false);
+      fetchMeetings();
+    }
   }
 
-  function handleSignOut(meeting) {
-    const nextMeetings = meetings.map((m) => {
-      if (m === meeting) {
-        m.participants = m.participants.filter((u) => u !== username);
-      }
-      return m;
+  async function handleDeleteMeeting(meeting) {
+    const response = await fetch(`/api/meetings/${meeting.id}`, {
+      method: "DELETE",
     });
-    setMeetings(nextMeetings);
+    if (response.ok) {
+      const nextMeetings = meetings.filter((m) => m !== meeting);
+      setMeetings(nextMeetings);
+    }
   }
+
+  async function handleSignIntoMeeting(meeting, username) {
+    console.log(username);
+    const response = await fetch(`/api/meetings/${meeting.id}/participants`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        login: username,
+      }),
+    });
+    if (response.ok) {
+      console.log("ok");
+    }
+  }
+
+  async function handleRemoveFromMeeting(meeting) {
+    const response = await fetch(`/api/meetings/${meeting.id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(meeting),
+    });
+    if (response.ok) {
+      console.log("ok");
+    }
+  }
+
+  useEffect(() => {
+    fetchMeetings();
+  }, []);
 
   return (
     <div>
@@ -52,8 +82,8 @@ export default function MeetingsPage({ username }) {
           meetings={meetings}
           username={username}
           onDelete={handleDeleteMeeting}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
+          onSignIntoMeeting={handleSignIntoMeeting}
+          onRemoveFromMeeting={handleRemoveFromMeeting}
         />
       )}
     </div>

@@ -2,8 +2,8 @@ export default function MeetingButtons({
   username,
   meeting,
   onDelete,
-  onSignOut,
-  onSignIn,
+  onSignIntoMeeting,
+  onRemoveFromMeeting,
 }) {
   const isAttending = meeting.participants.includes(username);
   const isEmpty = meeting.participants.length === 0;
@@ -11,9 +11,9 @@ export default function MeetingButtons({
   return (
     <>
       {isAttending ? (
-        <button onClick={onSignOut}>Wypisz się</button>
+        <button onClick={onRemoveFromMeeting}>Wypisz się</button>
       ) : (
-        <button onClick={onSignIn}>Zapisz się</button>
+        <button onClick={onSignIntoMeeting}>Zapisz się</button>
       )}
       {isEmpty && (
         <button onClick={onDelete} className="button-outline">
