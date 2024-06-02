@@ -1,4 +1,4 @@
-import MeetingsPage from "./meetings/MeetingsPage";
+import MeetingsPage from "./MeetingsPage";
 
 export default function UserPanel({ username, onLogout }) {
   return (

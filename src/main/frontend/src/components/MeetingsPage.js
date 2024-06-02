@@ -5,9 +5,16 @@ import MeetingsList from "./MeetingsList";
 export default function MeetingsPage({ username }) {
   const [meetings, setMeetings] = useState([]);
   const [addingNewMeeting, setAddingNewMeeting] = useState(false);
+  const token = localStorage.getItem("token");
 
   const fetchMeetings = async () => {
-    const response = await fetch("/api/meetings");
+    const response = await fetch("/api/meetings", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (response.ok) {
       const meetings = await response.json();
       setMeetings(meetings);
@@ -17,7 +24,10 @@ export default function MeetingsPage({ username }) {
   async function handleNewMeeting(meeting) {
     const response = await fetch("/api/meetings", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(meeting),
     });
     if (response.ok) {
@@ -29,47 +39,60 @@ export default function MeetingsPage({ username }) {
   }
 
   async function handleDeleteMeeting(meeting) {
-    const response = await fetch(`/api/meetings/${meeting.id}`, {
+    const response = await fetch(`/api/meetings/${meeting?.id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
     if (response.ok) {
       const nextMeetings = meetings.filter((m) => m !== meeting);
       setMeetings(nextMeetings);
+      fetchMeetings();
     }
   }
 
-  async function handleSignIntoMeeting(meeting, username) {
-    console.log(username);
+  async function handleSignIntoMeeting(meeting) {
+    const login = username;
+
     const response = await fetch(`/api/meetings/${meeting.id}/participants`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        login: username,
-      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ login }),
     });
     if (response.ok) {
       console.log("ok");
+      fetchMeetings();
     }
   }
 
   async function handleRemoveFromMeeting(meeting) {
-    const response = await fetch(`/api/meetings/${meeting.id}`, {
+    const response = await fetch(`/api/meetings/${meeting?.id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(meeting),
     });
     if (response.ok) {
       console.log("ok");
+      fetchMeetings();
     }
   }
 
   useEffect(() => {
     fetchMeetings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div>
-      <h2>Zajęcia ({meetings.length})</h2>
+      <h2>Zajęcia ({meetings?.length})</h2>
       {addingNewMeeting ? (
         <NewMeetingForm onSubmit={(meeting) => handleNewMeeting(meeting)} />
       ) : (

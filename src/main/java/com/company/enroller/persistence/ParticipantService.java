@@ -1,11 +1,13 @@
 package com.company.enroller.persistence;
 
-import com.company.enroller.model.Participant;
+import java.util.Collection;
+
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
+import com.company.enroller.model.Participant;
 
 @Component("participantService")
 public class ParticipantService {
@@ -16,42 +18,58 @@ public class ParticipantService {
         connector = DatabaseConnector.getInstance();
     }
 
-    public Collection<Participant> getAll(String login, String sortMode, String sortOrder) {
-        String hql = "FROM Participant WHERE login LIKE :login";
+    public Collection<Participant> getAll(String sortBy, String sortOrder, String key) {
+        String hql = "FROM Participant";
 
-        if (sortMode.equals("login")) {
-            hql += " ORDER BY login";
-            if (sortOrder.equals("ASC") || sortOrder.equals("DESC")) {
-                hql += " " + sortOrder;
+        if (key != null && !key.isEmpty()) {
+            hql += " WHERE login LIKE '%" + key + "%'";
+        }
+
+        if ("login".equals(sortBy)) {
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                hql += " ORDER BY login " + sortOrder;
+            } else {
+                hql += " ORDER BY login ASC";
             }
         }
 
-        Query query = connector.getSession().createQuery(hql);
-        query.setParameter("login", "%" + login + "%");
+        if ("password".equals(sortBy)) {
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                hql += " ORDER BY password " + sortOrder;
+            } else {
+                hql += " ORDER BY password ASC";
+            }
+        }
+
+        Session session = connector.getSession();
+        Query query = session.createQuery(hql);
+
         return query.list();
     }
 
-    public Participant findByLogin(String login) {
-        return connector.getSession().get(Participant.class, login);
+    public Participant getByLogin(String login) {
+        String hql = "FROM Participant WHERE login = :login";
+        Query <Participant>query = connector.getSession().createQuery(hql, Participant.class);
+        query.setParameter("login", login);
+
+        return query.uniqueResult();
     }
 
-    public Participant add(Participant participant) {
+    public void create(Participant participant) {
         Transaction transaction = connector.getSession().beginTransaction();
         connector.getSession().save(participant);
         transaction.commit();
-        return participant;
+    }
+
+    public void remove(Participant participant) {
+        Transaction transaction = connector.getSession().beginTransaction();
+        connector.getSession().remove(participant);
+        transaction.commit();
     }
 
     public void update(Participant participant) {
         Transaction transaction = connector.getSession().beginTransaction();
-        connector.getSession().merge(participant);
+        connector.getSession().update(participant);
         transaction.commit();
     }
-
-    public void delete(Participant participant) {
-        Transaction transaction = connector.getSession().beginTransaction();
-        connector.getSession().delete(participant);
-        transaction.commit();
-    }
-
 }

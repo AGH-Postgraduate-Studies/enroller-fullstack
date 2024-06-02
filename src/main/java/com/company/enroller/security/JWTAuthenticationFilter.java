@@ -30,7 +30,7 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     private final int tokenExpiration;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, String secret, String issuer, int tokenExpiration) {
-        super(new AntPathRequestMatcher("/tokens", HttpMethod.POST.name()));
+        super(new AntPathRequestMatcher("/api/tokens", HttpMethod.POST.name()));
         this.authenticationManager = authenticationManager;
         this.secret = secret;
         this.issuer = issuer;
@@ -59,6 +59,10 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .withExpiresAt(Date.from(now.plusSeconds(tokenExpiration).atZone(ZoneId.systemDefault()).toInstant()))
                 .withClaim("role", "participant")
                 .sign(Algorithm.HMAC256(secret));
+
+        res.setStatus(HttpServletResponse.SC_OK);
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
         res.getWriter().write(String.format("{\"token\": \"%s\"}", token));
     }
 }

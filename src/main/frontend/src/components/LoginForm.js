@@ -9,6 +9,9 @@ export default function LoginForm({ onSignIn, onSignUp }) {
     <div>
       {isSignIn ? (
         <>
+          <p>
+            Zaloguj się aby zacząć, lub stwórz nowe konto, aby się zalogować.
+          </p>
           <label>Zaloguj się</label>
           <input
             placeholder="email@example.com"
@@ -39,7 +42,14 @@ export default function LoginForm({ onSignIn, onSignUp }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button onClick={() => onSignUp(email, password)}>
+          <button
+            onClick={() => {
+              onSignUp(email, password);
+              setIsSignIn(true);
+              setEmail("");
+              setPassword("");
+            }}
+          >
             stwórz nowe konto
           </button>
         </>

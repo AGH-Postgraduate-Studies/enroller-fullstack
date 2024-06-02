@@ -12,20 +12,20 @@ export default function MeetingsList({
       <thead>
         <tr>
           <th>Nazwa spotkania</th>
-          <th>Opis</th>
+          <th>Opis spotkania</th>
           <th>Uczestnicy</th>
           <th>Akcje</th>
         </tr>
       </thead>
       <tbody>
-        {meetings.map((meeting, index) => (
+        {meetings?.map((meeting, index) => (
           <tr key={index}>
-            <td>{meeting.title}</td>
-            <td>{meeting.description}</td>
+            <td>{meeting?.title}</td>
+            <td>{meeting?.description}</td>
             <td>
-              {meeting.participants.length > 0 ? (
+              {meeting?.participants?.length > 0 ? (
                 <ul>
-                  {meeting.participants.map((p) => (
+                  {meeting?.participants?.map((p) => (
                     <li key={p.login}>{p.login}</li>
                   ))}
                 </ul>

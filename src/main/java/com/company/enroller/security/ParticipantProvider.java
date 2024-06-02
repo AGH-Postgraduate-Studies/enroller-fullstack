@@ -18,10 +18,12 @@ public class ParticipantProvider implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Participant participant = participantService.findByLogin(username);
+        Participant participant = participantService.getByLogin(username);
+
         if (participant == null) {
             throw new UsernameNotFoundException(username);
         }
+
         return new User(participant.getLogin(), participant.getPassword(), Collections.emptyList());
     }
 }

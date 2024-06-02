@@ -1,20 +1,25 @@
-import "milligram";
-import "./App.css";
-import { useState } from "react";
-import LoginForm from "./LoginForm";
-import UserPanel from "./UserPanel";
+import { useEffect, useState } from "react";
+import LoginForm from "./components/LoginForm";
+import UserPanel from "./components/UserPanel";
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState("");
+  const token = localStorage.getItem("token");
+
+  const [auth, setAuth] = useState(false);
+  const [login, setLogin] = useState("");
 
   async function signIn(email, password) {
     const response = await fetch("/api/tokens", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login: email, password: password }),
+      body: JSON.stringify({ login: email, password }),
     });
     if (response.ok) {
-      setLoggedIn(email);
+      setLogin(email);
+      const token = await response.json();
+      localStorage.setItem("login", email);
+      localStorage.setItem("token", token?.token);
+      setAuth(true);
     }
   }
 
@@ -22,28 +27,33 @@ function App() {
     const response = await fetch("/api/participants", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login: email, password: password }),
+      body: JSON.stringify({ login: email, password }),
     });
     if (response.ok) {
-      setLoggedIn(email);
+      console.log("ok");
     }
   }
 
   function signOut() {
-    setLoggedIn("");
+    localStorage.removeItem("token");
+    localStorage.removeItem("login");
+    setAuth(false);
   }
+
+  useEffect(() => {
+    if (token) {
+      setAuth(true);
+      setLogin(localStorage.getItem("login"));
+    }
+  }, [token]);
 
   return (
     <div>
       <h1>System do zapisów na zajęcia</h1>
-      {loggedIn ? (
-        <UserPanel username={loggedIn} onLogout={signOut} />
+      {auth ? (
+        <UserPanel username={login} onLogout={signOut} />
       ) : (
-        <LoginForm
-          onSignIn={signIn}
-          onSignUp={signUp}
-          setLoggedIn={setLoggedIn}
-        />
+        <LoginForm onSignIn={signIn} onSignUp={signUp} setLoggedIn={setLogin} />
       )}
     </div>
   );
