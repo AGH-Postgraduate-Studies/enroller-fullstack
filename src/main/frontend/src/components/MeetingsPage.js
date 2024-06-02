@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
 
@@ -35,6 +36,9 @@ export default function MeetingsPage({ username }) {
       setMeetings(nextMeetings);
       setAddingNewMeeting(false);
       fetchMeetings();
+      toast.success("Pomyślnie dodano spotkanie!");
+    } else {
+      toast.error("Wystąpił błąd podczas tworzenia spotkania!");
     }
   }
 
@@ -50,6 +54,9 @@ export default function MeetingsPage({ username }) {
       const nextMeetings = meetings.filter((m) => m !== meeting);
       setMeetings(nextMeetings);
       fetchMeetings();
+      toast.success("Pomyślnie usunięto spotkanie!");
+    } else {
+      toast.error("Wystąpił błąd podczas usuwania spotkania!");
     }
   }
 
@@ -65,8 +72,10 @@ export default function MeetingsPage({ username }) {
       body: JSON.stringify({ login }),
     });
     if (response.ok) {
-      console.log("ok");
       fetchMeetings();
+      toast.success("Pomyślnie zapisano!");
+    } else {
+      toast.error("Wystąpił błąd!");
     }
   }
 
@@ -80,14 +89,13 @@ export default function MeetingsPage({ username }) {
       body: JSON.stringify(meeting),
     });
     if (response.ok) {
-      console.log("ok");
       fetchMeetings();
+      toast.success("Pomyślnie usunięto!");
     }
   }
 
   useEffect(() => {
     fetchMeetings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

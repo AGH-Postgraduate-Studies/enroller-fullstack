@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import LoginForm from "./components/LoginForm";
 import UserPanel from "./components/UserPanel";
 
@@ -20,6 +21,11 @@ function App() {
       localStorage.setItem("login", email);
       localStorage.setItem("token", token?.token);
       setAuth(true);
+      toast.success("Pomyślnie zalogowano!");
+    } else if (response.status === 403) {
+      toast.error("Nieprawidłowy login lub hasło!");
+    } else {
+      toast.error("Wystąpił błąd!");
     }
   }
 
@@ -30,7 +36,9 @@ function App() {
       body: JSON.stringify({ login: email, password }),
     });
     if (response.ok) {
-      console.log("ok");
+      toast.success("Pomyślnie utworzono konto!");
+    } else {
+      toast.error("Wystąpił błąd podczas tworzenia konta!");
     }
   }
 
@@ -38,6 +46,7 @@ function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("login");
     setAuth(false);
+    toast.success("Pomyślnie wylogowano!");
   }
 
   useEffect(() => {
