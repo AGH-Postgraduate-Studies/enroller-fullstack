@@ -22,7 +22,7 @@ function App() {
       localStorage.setItem("token", token?.token);
       setAuth(true);
       toast.success("Pomyślnie zalogowano!");
-    } else if (response.status === 403) {
+    } else if (response.status === 401) {
       toast.error("Nieprawidłowy login lub hasło!");
     } else {
       toast.error("Wystąpił błąd!");

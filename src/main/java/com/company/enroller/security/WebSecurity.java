@@ -33,9 +33,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST,"/api/tokens").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/participants").permitAll()
-                .antMatchers("/**").authenticated()
+                .antMatchers("/api/**").authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
